@@ -304,19 +304,14 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
     
     setIsSaving(true);
     try {
-      // Map and prepare data rows to insert into movimientos_bancarios
+      // Map and prepare ONLY the 6 specified data rows to insert into movimientos_bancarios (other fields are automatic in DB!)
       const rowsToInsert = fileData.map(item => ({
         fecha: item.fecha,
         fecha_valor: item.fecha_valor,
-        anyo: item.anyo,
-        mes: item.mes,
-        mes_nombre: item.mes_nombre,
         movimiento: item.movimiento,
         mas_datos: item.mas_datos,
         importe: item.importe,
-        saldo: item.saldo,
-        concepto_reducido: item.concepto_reducido,
-        categoria: item.categoria
+        saldo: item.saldo
       }));
 
       const { data, error } = await supabase
