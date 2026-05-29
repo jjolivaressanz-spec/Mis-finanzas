@@ -58,7 +58,7 @@ export interface FilterState {
   month: number;
 }
 
-export type ViewState = 'dashboard' | 'accounts' | 'training' | 'analysis' | 'dictionary';
+export type ViewState = 'dashboard' | 'accounts' | 'training' | 'analysis' | 'dictionary' | 'import';
 
 // Utility types for UI
 export interface Toast {

@@ -6,6 +6,7 @@ import Training from './components/Training';
 import AnnualAnalysis from './components/AnnualAnalysis';
 import DictionaryManager from './components/DictionaryManager';
 import Accounts from './components/Accounts';
+import ImportDashboard from './components/ImportDashboard';
 import { ViewState, FilterState, Toast } from './types';
 import { XCircle, CheckCircle, Info } from 'lucide-react';
 
@@ -67,6 +68,12 @@ const App: React.FC = () => {
       case 'dictionary':
         return (
           <DictionaryManager 
+            onNotify={(msg, type) => addToast(msg, type as Toast['type'])}
+          />
+        );
+      case 'import':
+        return (
+          <ImportDashboard 
             onNotify={(msg, type) => addToast(msg, type as Toast['type'])}
           />
         );

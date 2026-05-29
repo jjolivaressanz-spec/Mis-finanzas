@@ -1,5 +1,5 @@
 
-import { LayoutDashboard, BrainCircuit, CreditCard, Menu, X, Sun, Moon, Table2, BookOpen, Wallet, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, BrainCircuit, CreditCard, Menu, X, Sun, Moon, Table2, BookOpen, Wallet, ChevronRight, Upload } from 'lucide-react';
 import React from 'react';
 import { ViewState } from '../types';
 
@@ -70,6 +70,13 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onNavigate, children }) =>
       icon: BrainCircuit, 
       color: 'violet' 
     },
+    { 
+      id: 'import', 
+      label: 'Importar', 
+      description: 'Cargar Excel del banco',
+      icon: Upload, 
+      color: 'rose' 
+    },
   ];
 
   const getColorClasses = (color: string, isActive: boolean) => {
@@ -83,6 +90,7 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onNavigate, children }) =>
       indigo: 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 ring-1 ring-indigo-500 shadow-sm',
       amber: 'border-amber-500 bg-amber-50 dark:bg-amber-900/20 ring-1 ring-amber-500 shadow-sm',
       violet: 'border-violet-500 bg-violet-50 dark:bg-violet-900/20 ring-1 ring-violet-500 shadow-sm',
+      rose: 'border-rose-500 bg-rose-50 dark:bg-rose-900/20 ring-1 ring-rose-500 shadow-sm',
     };
     return map[color] || map.blue;
   };
@@ -96,6 +104,7 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onNavigate, children }) =>
       indigo: 'bg-indigo-500 text-white',
       amber: 'bg-amber-500 text-white',
       violet: 'bg-violet-500 text-white',
+      rose: 'bg-rose-500 text-white',
     };
     return map[color] || map.blue;
   };
