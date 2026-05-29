@@ -113,13 +113,11 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onNavigate, children }) =>
     <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden font-sans">
       {/* Sidebar for Desktop */}
       <aside className="hidden md:flex flex-col w-80 bg-slate-50/50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-30 backdrop-blur-xl">
-        <div className="p-6 flex items-center space-x-3 mb-2">
-          <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-2.5 rounded-xl shadow-lg shadow-blue-500/20">
-            <CreditCard className="w-6 h-6 text-white" />
-          </div>
+        <div className="p-6 flex items-center space-x-4 mb-2">
+          <img src="/logo.png" alt="FinanzasPro Logo" className="w-20 h-20 object-contain rounded-3xl shadow-xl hover:scale-105 transition-transform duration-300" />
           <div>
-            <span className="block text-lg font-extrabold tracking-tight text-slate-800 dark:text-white leading-tight">FinanzasPro</span>
-            <span className="text-[10px] uppercase tracking-widest text-slate-400 font-semibold">Personal Dashboard</span>
+            <span className="block text-xl font-black tracking-tight text-slate-800 dark:text-white leading-tight">FinanzasPro</span>
+            <span className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Personal Dashboard</span>
           </div>
         </div>
         
@@ -173,11 +171,9 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onNavigate, children }) =>
       {/* Mobile Header & Sidebar Overlay */}
       <div className="flex-1 flex flex-col h-full overflow-hidden relative">
         <header className="md:hidden flex items-center justify-between p-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-40">
-          <div className="flex items-center space-x-2">
-            <div className="bg-blue-600 p-1.5 rounded-lg">
-              <CreditCard className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold text-slate-800 dark:text-white">FinanzasPro</span>
+          <div className="flex items-center space-x-3">
+            <img src="/logo.png" alt="FinanzasPro Logo" className="w-14 h-14 object-contain rounded-2xl shadow-lg" />
+            <span className="font-extrabold text-slate-800 dark:text-white">FinanzasPro</span>
           </div>
           <button onClick={() => setSidebarOpen(!isSidebarOpen)} className="p-2 text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-lg">
             {isSidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}

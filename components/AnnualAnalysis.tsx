@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase, formatCurrency } from '../services/supabase';
-import { Filter, ChevronRight, ChevronDown, Loader2, ArrowUpCircle, ArrowDownCircle, BarChart3, Table2, FileDown } from 'lucide-react';
+import { Filter, ChevronRight, ChevronDown, Loader2, ArrowUpCircle, ArrowDownCircle, BarChart3, Table2, FileDown, Minimize2, Maximize2 } from 'lucide-react';
 import YearSelector from './YearSelector';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -45,6 +45,7 @@ interface FinancialData {
 const AnnualAnalysis: React.FC<AnnualAnalysisProps> = ({ onError }) => {
   const [year, setYear] = useState(new Date().getFullYear());
   const [loading, setLoading] = useState(true);
+  const [isReducedView, setIsReducedView] = useState(false);
   const [data, setData] = useState<FinancialData>({
     income: [],
     expenses: [],
@@ -210,9 +211,9 @@ const AnnualAnalysis: React.FC<AnnualAnalysisProps> = ({ onError }) => {
     doc.rect(0, 0, 297, 210, 'F');
 
     // --- Colors ---
-    const colorIncome = [16, 185, 129]; // Emerald 500
-    const colorExpense = [59, 130, 246]; // Blue 500
-    const colorNet = [30, 41, 59]; // Slate 800
+    const colorIncome: [number, number, number] = [16, 185, 129]; // Emerald 500
+    const colorExpense: [number, number, number] = [59, 130, 246]; // Blue 500
+    const colorNet: [number, number, number] = [30, 41, 59]; // Slate 800
     const colorText = [50, 50, 50];
     const colorLightText = [100, 100, 100];
 
@@ -673,7 +674,7 @@ const AnnualAnalysis: React.FC<AnnualAnalysisProps> = ({ onError }) => {
             </tr>
             
             {/* Concept Rows */}
-            {group.name !== 'Sin clasificar' && group.rows.map((row) => {
+            {!isReducedView && group.name !== 'Sin clasificar' && group.rows.map((row) => {
               const rowKey = `${type}|${group.name}|${row.name}`;
               const isExpanded = expandedKeys.has(rowKey);
               const showDropdown = row.hasMultipleOrigins;
@@ -752,6 +753,14 @@ const AnnualAnalysis: React.FC<AnnualAnalysisProps> = ({ onError }) => {
           </div>
           <div className="flex items-center gap-3">
             <button
+              onClick={() => setIsReducedView(!isReducedView)}
+              className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-xl border border-white/20 shadow-inner flex items-center gap-2 transition-colors"
+              title={isReducedView ? "Ver Vista Detallada" : "Ver Vista Reducida"}
+            >
+              {isReducedView ? <Maximize2 className="w-5 h-5" /> : <Minimize2 className="w-5 h-5" />}
+              <span className="hidden sm:inline">{isReducedView ? "Vista Detallada" : "Vista Reducida"}</span>
+            </button>
+            <button
               onClick={generatePDF}
               className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 py-2 rounded-xl border border-white/20 shadow-inner flex items-center gap-2 transition-colors"
               title="Exportar PDF"
@@ -793,7 +802,7 @@ const AnnualAnalysis: React.FC<AnnualAnalysisProps> = ({ onError }) => {
               <thead className="bg-gray-50 dark:bg-slate-700/50 sticky top-0 z-20">
                 <tr>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider sticky left-0 z-10 bg-gray-50 dark:bg-slate-800 border-r border-gray-200 dark:border-slate-700 shadow-[4px_0_8px_-4px_rgba(0,0,0,0.1)] min-w-[240px]">
-                    Concepto
+                    {isReducedView ? 'Categoría' : 'Concepto'}
                   </th>
                   {monthLabels.map(m => (
                     <th key={m} className="px-3 py-3 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase min-w-[80px]">
