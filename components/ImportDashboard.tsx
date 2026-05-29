@@ -3,7 +3,7 @@ import * as XLSX from 'xlsx';
 import { 
   Upload, FileText, AlertCircle, CheckCircle, Search, 
   Calendar, Coins, ArrowUpDown, ChevronLeft, ChevronRight, 
-  HelpCircle, Sparkles, Filter, Info, Trash2
+  HelpCircle, Sparkles, Filter, Info, Trash2, Database, Loader2
 } from 'lucide-react';
 import { getMonthName, formatCurrency, supabase } from '../services/supabase';
 
@@ -38,6 +38,7 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
   const [sortField, setSortField] = useState<keyof ParsedMovement>('fecha');
   const [sortAscending, setSortAscending] = useState(false);
   const [lastUpdateLimit, setLastUpdateLimit] = useState<string | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -298,6 +299,60 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
     onNotify('Carga limpiada correctamente.', 'info');
   };
 
+  const handleSaveToDatabase = async () => {
+    if (fileData.length === 0) return;
+    
+    setIsSaving(true);
+    try {
+      // Map and prepare data rows to insert into movimientos_bancarios
+      const rowsToInsert = fileData.map(item => ({
+        fecha: item.fecha,
+        fecha_valor: item.fecha_valor,
+        anyo: item.anyo,
+        mes: item.mes,
+        mes_nombre: item.mes_nombre,
+        movimiento: item.movimiento,
+        mas_datos: item.mas_datos,
+        importe: item.importe,
+        saldo: item.saldo,
+        concepto_reducido: item.concepto_reducido,
+        categoria: item.categoria
+      }));
+
+      const { data, error } = await supabase
+        .from('movimientos_bancarios')
+        .insert(rowsToInsert);
+
+      if (error) throw error;
+
+      onNotify(`¡Excelente! Se han insertado con éxito ${fileData.length} movimientos en la base de datos.`, 'success');
+      
+      // Clear loaded file data after successful insert
+      setFileData([]);
+      setFileName('');
+      setSearchTerm('');
+      setFilterType('all');
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+      
+      // Refresh the last update cutoff limit date
+      const { data: updateData } = await supabase
+        .from('vista_saldo_actual')
+        .select('ultima_actualizacion')
+        .maybeSingle();
+      if (updateData) {
+        setLastUpdateLimit(updateData.ultima_actualizacion);
+      }
+    } catch (err: any) {
+      console.error("Error inserting to DB:", err);
+      // Show full error message on screen as requested
+      onNotify(err.message || err.details || 'Error al insertar en la base de datos.', 'error');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   // Sorting Handler
   const requestSort = (field: keyof ParsedMovement) => {
     let isAsc = true;
@@ -377,13 +432,34 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
             </p>
           </div>
           {fileName && (
-            <button
-              onClick={clearImport}
-              className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 px-4 py-2 rounded-xl flex items-center gap-2 transition-all shadow-inner font-medium shrink-0 self-start md:self-auto"
-            >
-              <Trash2 className="w-4 h-4" />
-              Limpiar Carga
-            </button>
+            <div className="flex flex-wrap gap-3 shrink-0 self-start md:self-auto">
+              <button
+                onClick={handleSaveToDatabase}
+                disabled={isSaving}
+                className="bg-emerald-500 hover:bg-emerald-600 disabled:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-md text-sm border border-emerald-400/30"
+              >
+                {isSaving ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Insertando...
+                  </>
+                ) : (
+                  <>
+                    <Database className="w-4 h-4" />
+                    Insertar en BD ({fileData.length})
+                  </>
+                )}
+              </button>
+              
+              <button
+                onClick={clearImport}
+                disabled={isSaving}
+                className="bg-white/10 hover:bg-white/20 disabled:opacity-50 backdrop-blur-md text-white border border-white/20 px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-inner font-semibold text-sm"
+              >
+                <Trash2 className="w-4 h-4" />
+                Limpiar Carga
+              </button>
+            </div>
           )}
         </div>
         <div className="absolute right-0 top-0 opacity-10 pointer-events-none transform translate-x-12 -translate-y-12">
