@@ -5,7 +5,7 @@ import {
   Calendar, Coins, ArrowUpDown, ChevronLeft, ChevronRight, 
   HelpCircle, Sparkles, Filter, Info, Trash2
 } from 'lucide-react';
-import { getMonthName, formatCurrency } from '../services/supabase';
+import { getMonthName, formatCurrency, supabase } from '../services/supabase';
 
 interface ParsedMovement {
   fecha: string;
@@ -37,8 +37,28 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [sortField, setSortField] = useState<keyof ParsedMovement>('fecha');
   const [sortAscending, setSortAscending] = useState(false);
+  const [lastUpdateLimit, setLastUpdateLimit] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch lastUpdate on mount
+  React.useEffect(() => {
+    const fetchLastUpdate = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('vista_saldo_actual')
+          .select('ultima_actualizacion')
+          .maybeSingle();
+        if (error) throw error;
+        if (data) {
+          setLastUpdateLimit(data.ultima_actualizacion);
+        }
+      } catch (err) {
+        console.error("Error fetching last update limit:", err);
+      }
+    };
+    fetchLastUpdate();
+  }, []);
 
   // Helper to parse dates robustly (DD/MM/YYYY or native Date or Serial)
   const parseExcelDate = (val: any): string => {
@@ -162,7 +182,9 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
           throw new Error('Faltan columnas esenciales: "Fecha", "Movimiento" o "Importe".');
         }
 
+        let ignoredCount = 0;
         const movements: ParsedMovement[] = [];
+        const limitDate = lastUpdateLimit ? lastUpdateLimit.split('T')[0] : '';
 
         // Loop over data rows starting after the header
         for (let i = headerIndex + 1; i < rawRows.length; i++) {
@@ -179,6 +201,12 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
           // Perform formatting conversions
           const formattedFecha = parseExcelDate(rawFecha);
           if (!formattedFecha || !formattedFecha.includes('-')) continue; // invalid date skip
+
+          // Filter out rows with date <= lastUpdateLimit date part
+          if (limitDate && formattedFecha <= limitDate) {
+            ignoredCount++;
+            continue;
+          }
 
           const formattedFechaValor = colFechaValor !== -1 ? parseExcelDate(row[colFechaValor]) : formattedFecha;
           const cleanedImporte = parseExcelAmount(rawImporte);
@@ -206,12 +234,20 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
         }
 
         if (movements.length === 0) {
+          if (ignoredCount > 0) {
+            throw new Error(`Todos los registros (${ignoredCount}) han sido omitidos por ser de fecha igual o anterior a la última actualización (${new Date(limitDate).toLocaleDateString('es-ES')}).`);
+          }
           throw new Error('No se encontraron registros de movimientos válidos.');
         }
 
         setFileData(movements);
         setCurrentPage(1);
-        onNotify(`¡Fichero leído con éxito! Se cargaron ${movements.length} movimientos.`, 'success');
+        
+        let successMsg = `¡Fichero leído con éxito! Se cargaron ${movements.length} movimientos nuevos.`;
+        if (ignoredCount > 0) {
+          successMsg += ` Se omitieron ${ignoredCount} apuntes duplicados por ser de fecha igual o anterior a la última actualización (${new Date(limitDate).toLocaleDateString('es-ES')}).`;
+        }
+        onNotify(successMsg, 'success');
       } catch (err: any) {
         console.error(err);
         onNotify(err.message || 'Error al procesar el archivo Excel.', 'error');
@@ -392,6 +428,13 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
               <FileText className="w-4 h-4" />
               Examinar Archivos
             </button>
+            
+            {lastUpdateLimit && (
+              <div className="mt-6 flex items-center justify-center gap-2 text-xs text-slate-500 bg-slate-50 dark:bg-slate-950 px-4 py-2 rounded-xl border border-slate-100 dark:border-slate-800/80 font-medium shadow-sm">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>Última actualización en base de datos: **{new Date(lastUpdateLimit).toLocaleDateString('es-ES')}**. Los apuntes iguales o anteriores se omitirán para evitar duplicados.</span>
+              </div>
+            )}
           </div>
 
           {/* Guidelines / Format Card */}

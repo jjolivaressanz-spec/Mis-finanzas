@@ -147,6 +147,7 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
   // New State for nested table
   const [tableData, setTableData] = useState<ProcessedTableData>({ income: [], expenses: [] });
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
+  const [lastUpdate, setLastUpdate] = useState<string | null>(null);
 
   const fetchData = async () => {
     setLoading(true);
@@ -184,6 +185,17 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
       if (movsError) throw movsError;
       
       processTableData(rawMovs || []);
+
+      // 4. Fetch Last Update Date from vista_saldo_actual
+      const { data: balanceData, error: balanceError } = await supabase
+        .from('vista_saldo_actual')
+        .select('ultima_actualizacion')
+        .maybeSingle();
+
+      if (balanceError) throw balanceError;
+      if (balanceData) {
+        setLastUpdate(balanceData.ultima_actualizacion);
+      }
 
     } catch (err: any) {
       console.error(err);
@@ -294,6 +306,12 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
             <p className="mt-2 text-blue-100 max-w-xl">
               Control exhaustivo de ingresos y gastos para {getMonthName(filter.month)} de {filter.year}.
             </p>
+            {lastUpdate && (
+              <p className="text-xs text-blue-200 mt-2 flex items-center gap-1.5 opacity-90 font-medium">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                Última actualización: {new Date(lastUpdate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}
+              </p>
+            )}
           </div>
           <div className="bg-white/10 backdrop-blur-md p-2 rounded-xl border border-white/20 shadow-inner">
             <PeriodSelector 
