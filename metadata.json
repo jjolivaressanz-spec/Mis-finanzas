@@ -1,0 +1,5 @@
+{
+  "name": "Finanzas Personales Pro",
+  "description": "Dashboard financiero inteligente conectado a Supabase para gestión de gastos, KPIs y clasificación automática de movimientos.",
+  "requestFramePermissions": []
+}
