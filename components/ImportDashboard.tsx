@@ -155,7 +155,7 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
         const colFechaValor = headers.findIndex(h => h.includes('fecha valor') || (h.includes('fecha') && h.includes('valor')));
         const colMov = headers.findIndex(h => h.includes('movimiento') || h.includes('concepto') || h.includes('descrip'));
         const colMasDatos = headers.findIndex(h => h.includes('más datos') || h.includes('mas datos') || h.includes('información'));
-        const colImporte = headers.findIndex(h => h.includes('importe') || h.includes('cantidad') || h.includes('valor'));
+        const colImporte = headers.findIndex(h => h.includes('importe') || h.includes('cantidad') || (h.includes('valor') && !h.includes('fecha')));
         const colSaldo = headers.findIndex(h => h.includes('saldo') || h.includes('balance'));
 
         if (colFecha === -1 || colMov === -1 || colImporte === -1) {
@@ -594,11 +594,11 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
                         <td className="px-6 py-3.5 text-slate-500 dark:text-slate-400 italic text-xs max-w-[200px] truncate" title={row.mas_datos || ''}>
                           {row.mas_datos || '-'}
                         </td>
-                        <td className={`px-6 py-3.5 text-right font-bold whitespace-nowrap ${row.importe >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                          {row.importe >= 0 ? '+' : ''}{formatCurrency(row.importe)}
+                        <td className={`px-6 py-3.5 text-right font-bold font-mono whitespace-nowrap ${row.importe >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                          {row.importe >= 0 ? '+' : ''}{row.importe.toFixed(2)}
                         </td>
                         <td className="px-6 py-3.5 text-right font-medium text-slate-700 dark:text-slate-300 font-mono whitespace-nowrap">
-                          {formatCurrency(row.saldo)}
+                          {row.saldo.toFixed(2)}
                         </td>
                       </tr>
                     ))
