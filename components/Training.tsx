@@ -81,9 +81,9 @@ const Training: React.FC<TrainingProps> = ({ onNotify }) => {
 
   const openModal = (item: MovimientoRaw) => {
     setSelectedItem(item);
-    // Auto-fill suggestion based on bank text
+    // Auto-fill with the full original movement text
     setFormData({
-      patron: item.movimiento.split(' ').slice(0, 2).join(' '), // Suggest first 2 words
+      patron: item.movimiento,
       categoria: '',
       concepto_reducido: ''
     });
@@ -155,13 +155,13 @@ const Training: React.FC<TrainingProps> = ({ onNotify }) => {
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-10">
-      <div className="bg-indigo-600 rounded-xl p-8 text-white shadow-lg relative overflow-hidden">
+      <div className="bg-violet-600 rounded-xl p-8 text-white shadow-lg relative overflow-hidden">
         <div className="relative z-10">
           <h2 className="text-3xl font-bold flex items-center gap-3">
             <Brain className="w-8 h-8" />
             Entrenar al Sistema
           </h2>
-          <p className="mt-2 text-indigo-100 max-w-2xl">
+          <p className="mt-2 text-violet-100 max-w-2xl">
             Ayuda a la IA a entender tus gastos. Define reglas para los movimientos que aparecen como "Sin clasificar" y el sistema aplicará tu lógica automáticamente al pasado y futuro.
           </p>
         </div>
@@ -173,7 +173,7 @@ const Training: React.FC<TrainingProps> = ({ onNotify }) => {
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow border border-gray-100 dark:border-slate-700">
         <div className="p-6 border-b border-gray-100 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <h3 className="font-semibold text-gray-800 dark:text-white flex items-center gap-2">
-            <Loader2 className={`w-5 h-5 text-indigo-500 ${loading ? 'animate-spin' : ''}`} />
+            <Loader2 className={`w-5 h-5 text-violet-500 ${loading ? 'animate-spin' : ''}`} />
             Pendientes de revisión ({filteredItems.length} visible{filteredItems.length !== items.length ? 's' : ''})
           </h3>
 
@@ -262,7 +262,7 @@ const Training: React.FC<TrainingProps> = ({ onNotify }) => {
                     <td className="px-6 py-4 text-center">
                       <button
                         onClick={() => openModal(item)}
-                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 dark:text-indigo-300 dark:bg-indigo-900/30 dark:hover:bg-indigo-900/50 transition-colors"
+                        className="inline-flex items-center px-3 py-1.5 text-xs font-medium text-violet-600 bg-violet-50 rounded-lg hover:bg-violet-100 dark:text-violet-300 dark:bg-violet-900/30 dark:hover:bg-violet-900/50 transition-colors"
                       >
                         <Tag className="w-3 h-3 mr-1.5" />
                         Clasificar
@@ -304,7 +304,7 @@ const Training: React.FC<TrainingProps> = ({ onNotify }) => {
                     required
                     value={formData.patron}
                     onChange={(e) => setFormData({...formData, patron: e.target.value})}
-                    className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-700 dark:text-white text-sm"
+                    className="w-full pl-9 pr-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 bg-white dark:bg-slate-700 dark:text-white text-sm"
                     placeholder="Ej: NATURGY"
                   />
                 </div>
@@ -320,7 +320,7 @@ const Training: React.FC<TrainingProps> = ({ onNotify }) => {
                   required
                   value={formData.categoria}
                   onChange={(e) => setFormData({...formData, categoria: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-700 dark:text-white text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 bg-white dark:bg-slate-700 dark:text-white text-sm"
                   placeholder="Selecciona o escribe una categoría..."
                   list="categorias-sugeridas"
                 />
@@ -349,7 +349,7 @@ const Training: React.FC<TrainingProps> = ({ onNotify }) => {
                   required
                   value={formData.concepto_reducido}
                   onChange={(e) => setFormData({...formData, concepto_reducido: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white dark:bg-slate-700 dark:text-white text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-violet-500 bg-white dark:bg-slate-700 dark:text-white text-sm"
                   placeholder={formData.categoria ? `Ej: Naturgy (Sugeridos de ${formData.categoria})` : "Escribe un nombre limpio..."}
                   list="conceptos-sugeridos"
                   disabled={!formData.categoria}
@@ -376,7 +376,7 @@ const Training: React.FC<TrainingProps> = ({ onNotify }) => {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg shadow-sm transition-colors text-sm font-medium flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-lg shadow-sm transition-colors text-sm font-medium flex items-center justify-center gap-2"
                 >
                   {isSubmitting ? (
                     <>
