@@ -194,14 +194,14 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
   return (
     <div className="space-y-6 fade-in max-w-6xl mx-auto">
       {/* Header section */}
-      <div className="bg-indigo-700 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-amber-600 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h2 className="text-3xl font-bold flex items-center gap-3">
               <BookOpen className="w-8 h-8" />
               Gestión del Diccionario
             </h2>
-            <p className="mt-2 text-indigo-100 max-w-xl">
+            <p className="mt-2 text-amber-100 max-w-xl">
               Administra las reglas de clasificación automática. Puedes editar patrones, corregir categorías o eliminar reglas obsoletas.
             </p>
           </div>
@@ -233,14 +233,14 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
                 <input 
                   type="text"
                   placeholder="Buscar por patrón, categoría o concepto..."
-                  className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-indigo-500 outline-none text-sm transition-all"
+                  className="w-full pl-10 pr-4 py-2 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-amber-500 outline-none text-sm transition-all"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
              </div>
              <button
                 onClick={() => setIsCreating(true)}
-                className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-sm transition-colors text-sm font-medium"
+                className="w-full md:w-auto flex items-center justify-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow-sm transition-colors text-sm font-medium"
              >
                <Plus className="w-4 h-4" />
                Nueva Regla
@@ -256,7 +256,7 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
         <div className="overflow-x-auto">
           {loading ? (
             <div className="p-20 flex flex-col items-center justify-center text-gray-400">
-               <Loader2 className="w-10 h-10 animate-spin mb-4 text-indigo-500" />
+               <Loader2 className="w-10 h-10 animate-spin mb-4 text-amber-500" />
                <p>Cargando reglas y categorías...</p>
             </div>
           ) : filteredRules.length === 0 ? (
@@ -278,7 +278,7 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
                 {filteredRules.map((rule, idx) => (
                   <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors group">
                     <td className="px-6 py-4">
-                      <code className="text-sm font-mono text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded">
+                      <code className="text-sm font-mono text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/30 px-2 py-1 rounded">
                         {rule.patron}
                       </code>
                     </td>
@@ -296,7 +296,7 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
                       <div className="flex items-center justify-center gap-2">
                         <button 
                           onClick={() => openEditModal(rule)}
-                          className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                          className="p-2 text-gray-400 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-lg transition-all"
                           title="Editar regla"
                         >
                           <Edit3 className="w-4 h-4" />
@@ -344,7 +344,7 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
                   autoFocus
                   value={newRule.patron}
                   onChange={(e) => setNewRule({...newRule, patron: e.target.value.toUpperCase()})}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm font-mono uppercase"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm font-mono uppercase"
                   placeholder="Ej: AMAZON"
                 />
                 <p className="text-[10px] text-gray-400 mt-1">Texto único que identifica el movimiento</p>
@@ -357,7 +357,7 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
                   required
                   value={newRule.categoria}
                   onChange={(e) => setNewRule({...newRule, categoria: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm"
                   list="new-category-list"
                   placeholder="Escribe o selecciona..."
                 />
@@ -373,7 +373,7 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
                   required
                   value={newRule.concepto_reducido}
                   onChange={(e) => setNewRule({...newRule, concepto_reducido: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm"
                   placeholder="Ej: Amazon Web Services"
                   list="new-conceptos-sugeridos"
                   disabled={!newRule.categoria && !newRule.concepto_reducido}
@@ -405,7 +405,7 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
                 <button
                   type="submit"
                   disabled={isCreatingSaving}
-                  className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none transition-all text-sm font-semibold flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow-lg shadow-amber-200 dark:shadow-none transition-all text-sm font-semibold flex items-center justify-center gap-2"
                 >
                   {isCreatingSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   Crear Regla
@@ -447,7 +447,7 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
                   autoFocus
                   value={editingRule.categoria}
                   onChange={(e) => setEditingRule({...editingRule, categoria: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm"
                   list="full-category-list"
                   placeholder={originalRule?.categoria || "Escribe o selecciona..."}
                 />
@@ -464,7 +464,7 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
                   required
                   value={editingRule.concepto_reducido}
                   onChange={(e) => setEditingRule({...editingRule, concepto_reducido: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-amber-500 outline-none bg-white dark:bg-slate-700 dark:text-white text-sm"
                   placeholder={originalRule?.concepto_reducido || "Ej: Gasolinera Repsol"}
                   list="edit-conceptos-sugeridos"
                   disabled={!editingRule.categoria && !editingRule.concepto_reducido}
@@ -488,7 +488,7 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-lg shadow-indigo-200 dark:shadow-none transition-all text-sm font-semibold flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl shadow-lg shadow-amber-200 dark:shadow-none transition-all text-sm font-semibold flex items-center justify-center gap-2"
                 >
                   {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   Guardar Cambios
