@@ -1,7 +1,8 @@
 
-import { LayoutDashboard, BrainCircuit, CreditCard, Menu, X, Sun, Moon, Table2, BookOpen, Wallet, ChevronRight, Upload } from 'lucide-react';
+import { LayoutDashboard, BrainCircuit, CreditCard, Menu, X, Sun, Moon, Table2, BookOpen, Wallet, ChevronRight, Upload, LogOut } from 'lucide-react';
 import React from 'react';
 import { ViewState } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 interface NavItem {
   id: ViewState;
@@ -20,6 +21,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ currentView, onNavigate, children }) => {
   const [isSidebarOpen, setSidebarOpen] = React.useState(false);
   const [isDarkMode, setIsDarkMode] = React.useState(false);
+  const { signOut } = useAuth();
 
   React.useEffect(() => {
     if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
@@ -165,6 +167,14 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onNavigate, children }) =>
                <div className={`absolute top-1 w-3 h-3 bg-white rounded-full transition-all shadow-sm ${isDarkMode ? 'left-5' : 'left-1'}`} />
             </div>
           </button>
+          
+          <button 
+            onClick={signOut}
+            className="mt-2 flex items-center justify-center space-x-2 px-4 py-3 bg-red-50 hover:bg-red-100 dark:bg-red-900/20 dark:hover:bg-red-900/40 rounded-xl text-red-600 dark:text-red-400 w-full transition-all border border-red-100 dark:border-red-900/50 shadow-sm"
+          >
+            <LogOut className="w-4 h-4" />
+            <span className="text-xs font-semibold">Cerrar sesión</span>
+          </button>
         </div>
       </aside>
 
@@ -216,6 +226,18 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onNavigate, children }) =>
                     </button>
                   );
                 })}
+               </div>
+               <div className="p-4 border-t border-slate-100 dark:border-slate-800">
+                  <button 
+                    onClick={() => {
+                      signOut();
+                      setSidebarOpen(false);
+                    }}
+                    className="flex items-center justify-center space-x-2 px-4 py-3 bg-red-50 dark:bg-red-900/20 rounded-xl text-red-600 dark:text-red-400 w-full transition-all"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    <span className="text-sm font-bold">Cerrar sesión</span>
+                  </button>
                </div>
             </div>
           </div>
