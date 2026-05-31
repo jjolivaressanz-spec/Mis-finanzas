@@ -82,39 +82,39 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onNavigate, children }) =>
   ];
 
   const getColorClasses = (color: string, isActive: boolean) => {
-    // Estado inactivo: diseño sutil estilo tarjeta
-    if (!isActive) return 'border-gray-100 dark:border-slate-800 hover:border-gray-300 dark:hover:border-slate-600 bg-white dark:bg-slate-800/40 hover:shadow-md hover:-translate-y-0.5';
+    // Estado inactivo: transparente para fundirse con el menú, aparece al hacer hover
+    if (!isActive) return 'border-transparent bg-transparent hover:bg-slate-50 hover:border-slate-200 dark:hover:bg-slate-800/40 dark:hover:border-slate-700';
     
-    // Estado activo: colores vibrantes según la sección
+    // Estado activo: colores vibrantes y bordes marcados
     const map: Record<string, string> = {
-      emerald: 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-500 shadow-sm',
-      blue: 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 ring-1 ring-blue-500 shadow-sm',
-      indigo: 'border-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 ring-1 ring-indigo-500 shadow-sm',
-      amber: 'border-amber-500 bg-amber-50 dark:bg-amber-900/20 ring-1 ring-amber-500 shadow-sm',
-      violet: 'border-violet-500 bg-violet-50 dark:bg-violet-900/20 ring-1 ring-violet-500 shadow-sm',
-      rose: 'border-rose-500 bg-rose-50 dark:bg-rose-900/20 ring-1 ring-rose-500 shadow-sm',
+      emerald: 'border-emerald-200 bg-emerald-50 dark:bg-emerald-900/20 ring-1 ring-emerald-500 shadow-sm',
+      blue: 'border-blue-200 bg-blue-50 dark:bg-blue-900/20 ring-1 ring-blue-500 shadow-sm',
+      indigo: 'border-indigo-200 bg-indigo-50 dark:bg-indigo-900/20 ring-1 ring-indigo-500 shadow-sm',
+      amber: 'border-amber-200 bg-amber-50 dark:bg-amber-900/20 ring-1 ring-amber-500 shadow-sm',
+      violet: 'border-violet-200 bg-violet-50 dark:bg-violet-900/20 ring-1 ring-violet-500 shadow-sm',
+      rose: 'border-rose-200 bg-rose-50 dark:bg-rose-900/20 ring-1 ring-rose-500 shadow-sm',
     };
     return map[color] || map.blue;
   };
 
   const getIconColorClasses = (color: string, isActive: boolean) => {
-    if (!isActive) return 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-400';
+    if (!isActive) return 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 group-hover:bg-white group-hover:text-slate-700 group-hover:shadow-sm transition-all';
     
     const map: Record<string, string> = {
-      emerald: 'bg-emerald-500 text-white',
-      blue: 'bg-blue-500 text-white',
-      indigo: 'bg-indigo-500 text-white',
-      amber: 'bg-amber-500 text-white',
-      violet: 'bg-violet-500 text-white',
-      rose: 'bg-rose-500 text-white',
+      emerald: 'bg-emerald-500 text-white shadow-md shadow-emerald-500/20',
+      blue: 'bg-blue-500 text-white shadow-md shadow-blue-500/20',
+      indigo: 'bg-indigo-500 text-white shadow-md shadow-indigo-500/20',
+      amber: 'bg-amber-500 text-white shadow-md shadow-amber-500/20',
+      violet: 'bg-violet-500 text-white shadow-md shadow-violet-500/20',
+      rose: 'bg-rose-500 text-white shadow-md shadow-rose-500/20',
     };
     return map[color] || map.blue;
   };
 
   return (
-    <div className="flex h-screen bg-slate-50 dark:bg-slate-950 overflow-hidden font-sans">
+    <div className="flex h-screen bg-slate-100 dark:bg-slate-950 overflow-hidden font-sans">
       {/* Sidebar for Desktop */}
-      <aside className="hidden md:flex flex-col w-80 bg-slate-50/50 dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-30 backdrop-blur-xl">
+      <aside className="hidden md:flex flex-col w-80 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 z-30 shadow-sm">
         <div className="p-6 flex items-center space-x-4 mb-2">
           <img src="/logo.png" alt="FinanzasPro Logo" className="w-20 h-20 object-contain rounded-3xl shadow-xl hover:scale-105 transition-transform duration-300" />
           <div>
@@ -244,7 +244,7 @@ const Layout: React.FC<LayoutProps> = ({ currentView, onNavigate, children }) =>
         )}
 
         {/* Main Content Area - Responsive Width Logic */}
-        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-slate-50/50 dark:bg-slate-950/50 relative scroll-smooth">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 bg-transparent relative scroll-smooth">
           {/* 
              Solo aplicamos 'max-w-[1920px]' (Wide Mode) si estamos en la vista 'analysis'.
              Para el resto (dashboard, accounts, etc), volvemos a 'max-w-7xl' para centrar el contenido.

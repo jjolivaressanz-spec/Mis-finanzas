@@ -682,8 +682,8 @@ const AnnualAnalysis: React.FC<AnnualAnalysisProps> = ({ onError }) => {
               return (
                 <React.Fragment key={rowKey}>
                   {/* Main Row */}
-                  <tr className={`hover:bg-gray-50 dark:hover:bg-slate-700/30 transition-colors group ${isExpanded ? 'bg-gray-50 dark:bg-slate-800/50' : ''}`}>
-                    <td className="sticky left-0 z-10 bg-white dark:bg-slate-800 group-hover:bg-gray-50 dark:group-hover:bg-slate-700/30 px-4 py-2 text-left text-sm border-r border-gray-100 dark:border-slate-700 pl-8">
+                  <tr className={`hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group ${isExpanded ? 'bg-slate-50 dark:bg-slate-800/50' : ''}`}>
+                    <td className="sticky left-0 z-10 bg-white dark:bg-slate-800 group-hover:bg-slate-50 dark:group-hover:bg-slate-700/30 px-4 py-2 text-left text-sm border-r border-slate-100 dark:border-slate-700 pl-8 transition-colors">
                       <div 
                         className={`flex items-center gap-2 select-none ${showDropdown ? 'cursor-pointer' : ''}`}
                         onClick={() => showDropdown && toggleRow(type, group.name, row.name)}
@@ -714,8 +714,8 @@ const AnnualAnalysis: React.FC<AnnualAnalysisProps> = ({ onError }) => {
 
                   {/* Expanded Details Rows */}
                   {isExpanded && row.breakdown.map((detail, dIdx) => (
-                     <tr key={`${rowKey}-detail-${dIdx}`} className="bg-gray-50/50 dark:bg-slate-800/20">
-                        <td className="sticky left-0 z-10 bg-gray-50 dark:bg-slate-900 px-4 py-1.5 text-left text-xs border-r border-gray-100 dark:border-slate-700 pl-14 text-gray-500 dark:text-gray-400 font-mono italic truncate max-w-[240px]" title={detail.originalName}>
+                     <tr key={`${rowKey}-detail-${dIdx}`} className="bg-slate-50/50 dark:bg-slate-800/20 hover:bg-slate-100 dark:hover:bg-slate-700/40 transition-colors group">
+                        <td className="sticky left-0 z-10 bg-slate-50 dark:bg-slate-900 group-hover:bg-slate-100 dark:group-hover:bg-slate-700/40 px-4 py-1.5 text-left text-xs border-r border-slate-100 dark:border-slate-700 pl-14 text-slate-500 dark:text-slate-400 font-mono italic truncate max-w-[240px] transition-colors" title={detail.originalName}>
                            {detail.originalName.toLowerCase()}
                         </td>
                         {detail.months.map((val, mIdx) => (
@@ -785,16 +785,28 @@ const AnnualAnalysis: React.FC<AnnualAnalysisProps> = ({ onError }) => {
       {/* Main Content Area */}
       <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex-1 overflow-hidden flex flex-col relative">
         {loading ? (
-           <div className="flex-1 flex items-center justify-center">
-             <div className="flex flex-col items-center gap-3">
-               <Loader2 className="animate-spin h-10 w-10 text-indigo-600" />
-               <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">Generando Matriz...</span>
-             </div>
+           <div className="p-8 space-y-5 w-full h-full">
+             {/* Header row skeleton */}
+             <div className="h-10 bg-slate-200 dark:bg-slate-700/50 rounded-lg w-full animate-pulse mb-8"></div>
+             {/* Table rows skeleton */}
+             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+               <div key={i} className="flex gap-4 animate-pulse items-center">
+                 <div className="h-5 bg-slate-100 dark:bg-slate-800 rounded w-1/4"></div>
+                 <div className="h-5 bg-slate-100 dark:bg-slate-800 rounded w-full"></div>
+               </div>
+             ))}
            </div>
         ) : data.income.length === 0 && data.expenses.length === 0 ? (
-          <div className="flex-1 flex flex-col items-center justify-center text-gray-400">
-            <Filter className="w-12 h-12 mb-2 opacity-50" />
-            <p>No hay datos registrados para el año {year}</p>
+          <div className="flex-1 flex flex-col items-center justify-center p-16">
+            <div className="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-full mb-6 relative group cursor-default">
+              <div className="absolute inset-0 bg-indigo-100 dark:bg-indigo-900/20 rounded-full scale-0 group-hover:scale-125 transition-transform duration-700 opacity-50"></div>
+              <Table2 className="w-12 h-12 text-slate-300 dark:text-slate-600 relative z-10 transition-transform group-hover:scale-110 duration-500" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200">Matriz Vacía</h3>
+            <p className="text-slate-500 text-center max-w-sm mt-3 leading-relaxed">
+              No hay datos financieros registrados para todo el año {year}. 
+              Selecciona otro año o comienza a importar tus movimientos bancarios.
+            </p>
           </div>
         ) : (
           <div className="overflow-auto flex-1 custom-scrollbar">
