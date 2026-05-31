@@ -123,7 +123,7 @@ const Accounts: React.FC<AccountsProps> = ({ onError }) => {
           <div>
             <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Cuenta Corriente</p>
             <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-              {loading ? '...' : formatCurrency(currentBalance)}
+              {loading ? <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-32 animate-pulse"></div> : formatCurrency(currentBalance)}
             </h3>
             <p className="text-[11px] text-gray-400 mt-1 flex items-center gap-1">
                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -156,7 +156,7 @@ const Accounts: React.FC<AccountsProps> = ({ onError }) => {
           <div>
             <p className="text-xs font-bold text-slate-400 dark:text-blue-100 uppercase tracking-widest">Patrimonio Neto</p>
             <h3 className="text-3xl font-bold text-white mt-2">
-              {loading ? '...' : formatCurrency(totalAssets)}
+              {loading ? <div className="h-8 bg-slate-700 dark:bg-blue-400 rounded w-32 animate-pulse"></div> : formatCurrency(totalAssets)}
             </h3>
           </div>
           <div className="mt-4">
@@ -180,12 +180,9 @@ const Accounts: React.FC<AccountsProps> = ({ onError }) => {
         </div>
         
         {loading ? (
-             <div className="h-[400px] flex items-center justify-center">
-                <div className="flex flex-col items-center gap-3">
-                   <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600"></div>
-                   <span className="text-xs text-gray-400 font-medium animate-pulse uppercase tracking-widest">Cargando series...</span>
-                </div>
-            </div>
+             <div className="h-[400px] w-full p-2">
+                <div className="w-full h-full bg-slate-100 dark:bg-slate-800/50 rounded-xl animate-pulse"></div>
+             </div>
         ) : evolucion.length === 0 ? (
             <div className="h-[400px] flex flex-col items-center justify-center text-gray-400 bg-gray-50/50 dark:bg-slate-900/20 rounded-xl border-2 border-dashed border-gray-200 dark:border-slate-700">
               <TrendingUp className="w-12 h-12 mb-2 opacity-20" />

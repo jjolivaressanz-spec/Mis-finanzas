@@ -285,8 +285,25 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
 
   if (loading && !resumen && gastosCategoria.length === 0) {
     return (
-      <div className="flex h-96 items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="space-y-6 fade-in w-full">
+        {/* Header Skeleton */}
+        <div className="bg-slate-200 dark:bg-slate-800 rounded-2xl h-[130px] w-full animate-pulse"></div>
+        {/* KPI Cards Skeleton */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 animate-pulse">
+              <div className="flex justify-between items-start">
+                <div className="space-y-3 w-full">
+                  <div className="h-4 bg-slate-100 dark:bg-slate-700 rounded w-24"></div>
+                  <div className="h-8 bg-slate-100 dark:bg-slate-700 rounded w-32 mt-2"></div>
+                </div>
+                <div className="h-12 w-12 bg-slate-100 dark:bg-slate-700 rounded-lg shrink-0"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* Chart Skeleton */}
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 h-[380px] animate-pulse"></div>
       </div>
     );
   }
@@ -296,7 +313,7 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
   return (
     <div className="space-y-6 fade-in">
       {/* Banner Header */}
-      <div className="bg-blue-600 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
             <h2 className="text-3xl font-bold flex items-center gap-3">
@@ -327,48 +344,50 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
       </div>
 
       {isEmpty && !loading ? (
-        <div className="flex flex-col items-center justify-center p-12 bg-white dark:bg-slate-800 rounded-xl border border-dashed border-gray-300 dark:border-slate-600">
-          <div className="p-4 bg-gray-100 dark:bg-slate-700 rounded-full mb-4">
-            <AlertCircle className="w-8 h-8 text-gray-400" />
+        <div className="flex flex-col items-center justify-center p-16 bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 mt-6">
+          <div className="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-full mb-6 relative group cursor-default">
+            <div className="absolute inset-0 bg-blue-100 dark:bg-blue-900/20 rounded-full scale-0 group-hover:scale-125 transition-transform duration-700 opacity-50"></div>
+            <LayoutDashboard className="w-12 h-12 text-slate-300 dark:text-slate-600 relative z-10 transition-transform group-hover:scale-110 duration-500" />
           </div>
-          <h3 className="text-lg font-medium text-gray-900 dark:text-white">Sin datos para este periodo</h3>
-          <p className="text-gray-500 text-center max-w-sm mt-1">
-            No se han encontrado movimientos para {getMonthName(filter.month)} del {filter.year}. Intenta seleccionar otro mes.
+          <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200">Lienzo en blanco</h3>
+          <p className="text-slate-500 text-center max-w-sm mt-3 leading-relaxed">
+            No hay movimientos registrados para {getMonthName(filter.month)} de {filter.year}. 
+            Selecciona otro periodo o importa nuevos datos para empezar el análisis.
           </p>
         </div>
       ) : (
         <>
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between transition-transform hover:-translate-y-1 hover:shadow-md duration-200">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Ingresos Totales</p>
-                <h3 className="text-2xl font-bold text-emerald-600 mt-1">{formatCurrency(resumen?.ingresos || 0)}</h3>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Ingresos Totales</p>
+                <h3 className="text-2xl font-bold font-mono text-emerald-600 mt-1">{formatCurrency(resumen?.ingresos || 0)}</h3>
               </div>
               <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
                 <ArrowUpCircle className="w-6 h-6 text-emerald-600 dark:text-emerald-400" />
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center justify-between">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between transition-transform hover:-translate-y-1 hover:shadow-md duration-200">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Gastos Totales</p>
-                <h3 className="text-2xl font-bold text-rose-600 mt-1">{formatCurrency(Math.abs(resumen?.gastos || 0))}</h3>
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Gastos Totales</p>
+                <h3 className="text-2xl font-bold font-mono text-rose-600 mt-1">{formatCurrency(Math.abs(resumen?.gastos || 0))}</h3>
               </div>
               <div className="p-3 bg-rose-50 dark:bg-rose-900/20 rounded-lg">
                 <ArrowDownCircle className="w-6 h-6 text-rose-600 dark:text-rose-400" />
               </div>
             </div>
 
-            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex items-center justify-between">
+            <div className="bg-gradient-to-br from-slate-900 to-slate-800 p-6 rounded-xl shadow-md border border-slate-800 flex items-center justify-between transition-transform hover:-translate-y-1 hover:shadow-lg duration-200">
               <div>
-                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Balance Neto</p>
-                <h3 className={`text-2xl font-bold mt-1 ${(resumen?.balance_neto || 0) >= 0 ? 'text-blue-600' : 'text-orange-500'}`}>
+                <p className="text-sm font-medium text-slate-400">Balance Neto</p>
+                <h3 className={`text-3xl font-bold font-mono mt-1 ${(resumen?.balance_neto || 0) >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
                   {formatCurrency(resumen?.balance_neto || 0)}
                 </h3>
               </div>
-              <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                <Wallet className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
+                <Wallet className="w-7 h-7 text-slate-200" />
               </div>
             </div>
           </div>
