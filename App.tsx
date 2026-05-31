@@ -9,8 +9,12 @@ import Accounts from './components/Accounts';
 import ImportDashboard from './components/ImportDashboard';
 import { ViewState, FilterState, Toast } from './types';
 import { XCircle, CheckCircle, Info } from 'lucide-react';
+import { useAuth } from './contexts/AuthContext';
+import Auth from './components/Auth';
 
 const App: React.FC = () => {
+  const { user } = useAuth();
+  
   // Navigation State
   const [currentView, setCurrentView] = useState<ViewState>('dashboard');
   
@@ -81,6 +85,10 @@ const App: React.FC = () => {
         return null;
     }
   };
+
+  if (!user) {
+    return <Auth />;
+  }
 
   return (
     <>
