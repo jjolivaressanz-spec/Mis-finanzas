@@ -138,12 +138,15 @@ const DictionaryManager: React.FC<DictionaryManagerProps> = ({ onNotify }) => {
         throw new Error(`Ya existe una regla para el patrón "${newRule.patron}"`);
       }
 
+      const { data: userData } = await supabase.auth.getUser();
+      
       const { error } = await supabase
         .from('diccionario_categorias')
         .insert([{
           patron: newRule.patron,
           categoria: newRule.categoria,
-          concepto_reducido: newRule.concepto_reducido
+          concepto_reducido: newRule.concepto_reducido,
+          user_id: userData?.user?.id
         }]);
 
       if (error) throw error;

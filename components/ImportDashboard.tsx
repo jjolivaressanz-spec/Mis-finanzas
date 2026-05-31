@@ -304,14 +304,20 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
     
     setIsSaving(true);
     try {
-      // Map and prepare ONLY the 6 specified data rows to insert into movimientos_bancarios (other fields are automatic in DB!)
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData?.user) {
+        throw new Error('No se pudo identificar al usuario activo para realizar la inserción.');
+      }
+
+      // Map and prepare ONLY the 6 specified data rows + user_id to insert into movimientos_bancarios
       const rowsToInsert = fileData.map(item => ({
         fecha: item.fecha,
         fecha_valor: item.fecha_valor,
         movimiento: item.movimiento,
         mas_datos: item.mas_datos,
         importe: item.importe,
-        saldo: item.saldo
+        saldo: item.saldo,
+        user_id: userData.user.id
       }));
 
       const { data, error } = await supabase
