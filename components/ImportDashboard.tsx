@@ -68,7 +68,10 @@ const ImportDashboard: React.FC<ImportDashboardProps> = ({ onNotify }) => {
     // 1. Already a Date object
     if (val instanceof Date) {
       try {
-        return val.toISOString().split('T')[0];
+        const year = val.getFullYear();
+        const month = String(val.getMonth() + 1).padStart(2, '0');
+        const day = String(val.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
       } catch {
         // Fallback if invalid date
       }
