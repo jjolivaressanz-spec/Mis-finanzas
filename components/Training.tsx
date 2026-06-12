@@ -109,13 +109,18 @@ const Training: React.FC<TrainingProps> = ({ onNotify }) => {
     setProcessingMsg('Guardando nueva regla...');
 
     try {
+      // Get current user to satisfy RLS
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (userError || !userData.user) throw new Error("No se pudo obtener el usuario autenticado.");
+
       // 1. Insert Rule
       const { error: insertError } = await supabase
         .from('diccionario_categorias')
         .insert([{
           patron: formData.patron,
           categoria: formData.categoria,
-          concepto_reducido: formData.concepto_reducido
+          concepto_reducido: formData.concepto_reducido,
+          user_id: userData.user.id
         }]);
 
       if (insertError) throw insertError;
