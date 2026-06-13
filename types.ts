@@ -66,3 +66,8 @@ export interface Toast {
   message: string;
   type: 'success' | 'error' | 'info';
 }
+
+export interface UserSettings {
+  user_id: string;
+  savings_amount: number;
+}

@@ -3,8 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { supabase, formatCurrency, getMonthName, formatPercent } from '../services/supabase';
 import { FilterState, ResumenMensual, GastoCategoria } from '../types';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
-import { ArrowUpCircle, ArrowDownCircle, Wallet, AlertCircle, SearchX, ChevronRight, ChevronDown, LayoutDashboard } from 'lucide-react';
+import { ArrowUpCircle, ArrowDownCircle, Wallet, AlertCircle, SearchX, ChevronRight, ChevronDown, LayoutDashboard, PiggyBank, Edit2, Check, X } from 'lucide-react';
 import PeriodSelector from './PeriodSelector';
+import { useAuth } from '../contexts/AuthContext';
+import { getSettings, updateSavingsAmount } from '../services/settings';
 
 // Colors for the donut chart
 const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899', '#6366f1', '#64748b'];
@@ -140,6 +142,7 @@ const RenderCategoryGroup: React.FC<RenderCategoryGroupProps> = ({ group, isInco
 };
 
 const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [resumen, setResumen] = useState<ResumenMensual | null>(null);
   const [gastosCategoria, setGastosCategoria] = useState<GastoCategoria[]>([]);
@@ -148,6 +151,10 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
   const [tableData, setTableData] = useState<ProcessedTableData>({ income: [], expenses: [] });
   const [expandedKeys, setExpandedKeys] = useState<Set<string>>(new Set());
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
+
+  const [savingsAmount, setSavingsAmount] = useState(100000);
+  const [isEditingSavings, setIsEditingSavings] = useState(false);
+  const [tempSavingsAmount, setTempSavingsAmount] = useState('100000');
 
   const fetchData = async () => {
     setLoading(true);
@@ -195,6 +202,13 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
       if (balanceError) throw balanceError;
       if (balanceData) {
         setLastUpdate(balanceData.ultima_actualizacion);
+      }
+
+      // 5. Fetch Settings
+      if (user) {
+        const settings = await getSettings(user.id);
+        setSavingsAmount(settings.savings_amount);
+        setTempSavingsAmount(settings.savings_amount.toString());
       }
 
     } catch (err: any) {
@@ -266,6 +280,24 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
     });
   };
 
+  const handleSaveSavings = async () => {
+    try {
+      if (!user) return;
+      const numValue = Number(tempSavingsAmount);
+      if (isNaN(numValue)) {
+        onError('Valor inválido para ahorro');
+        return;
+      }
+      await updateSavingsAmount(user.id, numValue);
+      setSavingsAmount(numValue);
+      setIsEditingSavings(false);
+      // Opcional: mostrar un success toast, aunque no lo tenemos en las props del Dashboard ahora mismo, 
+      // solo tenemos onError. Se actualizará la UI inmediatamente.
+    } catch (err: any) {
+      onError('Error guardando cartera de ahorro');
+    }
+  };
+
   const toggleRow = (category: string, concept: string) => {
     const key = `${category}|${concept}`;
     const newExpanded = new Set(expandedKeys);
@@ -289,8 +321,8 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
         {/* Header Skeleton */}
         <div className="bg-slate-200 dark:bg-slate-800 rounded-2xl h-[130px] w-full animate-pulse"></div>
         {/* KPI Cards Skeleton */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {[1, 2, 3, 4].map((i) => (
             <div key={i} className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 animate-pulse">
               <div className="flex justify-between items-start">
                 <div className="space-y-3 w-full">
@@ -358,7 +390,7 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
       ) : (
         <>
           {/* KPI Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-between transition-transform hover:-translate-y-1 hover:shadow-md duration-200">
               <div>
                 <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Ingresos Totales</p>
@@ -388,6 +420,55 @@ const Dashboard: React.FC<DashboardProps> = ({ filter, setFilter, onError }) => 
               </div>
               <div className="p-3 bg-white/10 rounded-lg backdrop-blur-sm">
                 <Wallet className="w-7 h-7 text-slate-200" />
+              </div>
+            </div>
+
+            {/* Savings Account Editable KPI */}
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-emerald-100 dark:border-emerald-900/30 flex flex-col justify-between transition-transform hover:-translate-y-1 hover:shadow-md duration-200 relative group">
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-medium text-slate-500 dark:text-slate-400">Cartera Ahorro</p>
+                <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg">
+                  <PiggyBank className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+                </div>
+              </div>
+              <div className="mt-2 flex items-center">
+                {isEditingSavings ? (
+                  <div className="flex items-center gap-2 mt-1">
+                    <input 
+                      type="number"
+                      value={tempSavingsAmount}
+                      onChange={(e) => setTempSavingsAmount(e.target.value)}
+                      className="w-24 px-2 py-1 text-sm border border-slate-300 dark:border-slate-600 rounded bg-white dark:bg-slate-700 text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-emerald-500"
+                      autoFocus
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleSaveSavings();
+                        if (e.key === 'Escape') {
+                           setIsEditingSavings(false);
+                           setTempSavingsAmount(savingsAmount.toString());
+                        }
+                      }}
+                    />
+                    <button onClick={handleSaveSavings} className="p-1 text-emerald-600 hover:bg-emerald-50 rounded">
+                      <Check className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => { setIsEditingSavings(false); setTempSavingsAmount(savingsAmount.toString()); }} className="p-1 text-rose-500 hover:bg-rose-50 rounded">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-2xl font-bold font-mono text-emerald-700 dark:text-emerald-300 mt-1">
+                      {formatCurrency(savingsAmount)}
+                    </h3>
+                    <button 
+                      onClick={() => setIsEditingSavings(true)}
+                      className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-full opacity-0 group-hover:opacity-100 transition-all mt-1"
+                      title="Editar saldo de ahorro"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

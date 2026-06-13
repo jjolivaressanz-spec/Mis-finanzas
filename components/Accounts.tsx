@@ -3,7 +3,9 @@ import React, { useState, useEffect } from 'react';
 import { supabase, formatCurrency } from '../services/supabase';
 import { EvolucionSaldo } from '../types';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
-import { Wallet, TrendingUp, PiggyBank } from 'lucide-react';
+import { Wallet, TrendingUp, PiggyBank, Edit2, Check, X } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { getSettings, updateSavingsAmount } from '../services/settings';
 
 interface AccountsProps {
   onError: (msg: string) => void;
@@ -26,13 +28,14 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 const Accounts: React.FC<AccountsProps> = ({ onError }) => {
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [evolucion, setEvolucion] = useState<EvolucionSaldo[]>([]);
   const [currentBalance, setCurrentBalance] = useState(0);
   const [lastUpdate, setLastUpdate] = useState<string | null>(null);
-
-  // Capital Ahorro Manual
-  const SAVINGS_AMOUNT = 100000;
+  const [savingsAmount, setSavingsAmount] = useState(100000);
+  const [isEditingSavings, setIsEditingSavings] = useState(false);
+  const [tempSavingsAmount, setTempSavingsAmount] = useState('100000');
 
   const fetchData = async () => {
     setLoading(true);
@@ -64,6 +67,13 @@ const Accounts: React.FC<AccountsProps> = ({ onError }) => {
         setCurrentBalance(balanceData.saldo);
         setLastUpdate(balanceData.ultima_actualizacion);
       }
+
+      // 3. Fetch User Settings
+      if (user) {
+        const settings = await getSettings(user.id);
+        setSavingsAmount(settings.savings_amount);
+        setTempSavingsAmount(settings.savings_amount.toString());
+      }
     } catch (err: any) {
       console.error("--> Accounts Error:", err);
       onError(err.message || 'Error cargando datos de cuentas');
@@ -77,7 +87,23 @@ const Accounts: React.FC<AccountsProps> = ({ onError }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const totalAssets = currentBalance + SAVINGS_AMOUNT;
+  const handleSaveSavings = async () => {
+    try {
+      if (!user) return;
+      const numValue = Number(tempSavingsAmount);
+      if (isNaN(numValue)) {
+        onError('Valor inválido para ahorro');
+        return;
+      }
+      await updateSavingsAmount(user.id, numValue);
+      setSavingsAmount(numValue);
+      setIsEditingSavings(false);
+    } catch (err: any) {
+      onError('Error guardando cartera de ahorro');
+    }
+  };
+
+  const totalAssets = currentBalance + savingsAmount;
 
   // Formatting for Y Axis: "28,5k"
   const formatYAxis = (val: number) => {
@@ -116,17 +142,17 @@ const Accounts: React.FC<AccountsProps> = ({ onError }) => {
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Checking Account */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex flex-col justify-between relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-blue-600">
-            <Wallet className="w-16 h-16" />
+        <div className="bg-gradient-to-br from-blue-600 to-indigo-700 p-6 rounded-xl shadow-lg border border-blue-500/30 flex flex-col justify-between relative overflow-hidden group transition-all hover:shadow-xl hover:-translate-y-1">
+          <div className="absolute top-0 right-0 p-4 opacity-20 text-white transition-transform group-hover:scale-110 duration-300">
+            <Wallet className="w-24 h-24 -mr-4 -mt-4" />
           </div>
-          <div>
-            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Cuenta Corriente</p>
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-              {loading ? <div className="h-8 bg-slate-200 dark:bg-slate-700 rounded w-32 animate-pulse"></div> : formatCurrency(currentBalance)}
+          <div className="relative z-10">
+            <p className="text-xs font-bold text-blue-200 uppercase tracking-widest">Cuenta Corriente</p>
+            <h3 className="text-3xl font-bold text-white mt-2">
+              {loading ? <div className="h-8 bg-white/20 rounded w-32 animate-pulse"></div> : formatCurrency(currentBalance)}
             </h3>
-            <p className="text-[11px] text-gray-400 mt-1 flex items-center gap-1">
-               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <p className="text-[11px] text-blue-200 mt-1 flex items-center gap-1">
+               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                {lastUpdate 
                  ? `Sincronizado: ${new Date(lastUpdate).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })}` 
                  : 'Sincronizando...'}
@@ -135,34 +161,62 @@ const Accounts: React.FC<AccountsProps> = ({ onError }) => {
         </div>
 
         {/* Savings Account */}
-        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 flex flex-col justify-between relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity text-emerald-600">
-            <PiggyBank className="w-16 h-16" />
+        <div className="bg-gradient-to-br from-orange-500 to-amber-600 p-6 rounded-xl shadow-lg border border-orange-400/30 flex flex-col justify-between relative overflow-hidden group transition-all hover:shadow-xl hover:-translate-y-1">
+          <div className="absolute top-0 right-0 p-4 opacity-20 text-white transition-transform group-hover:scale-110 duration-300">
+            <PiggyBank className="w-24 h-24 -mr-4 -mt-4" />
           </div>
-          <div>
-            <p className="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">Cartera Ahorro</p>
-            <h3 className="text-3xl font-bold text-gray-900 dark:text-white mt-2">
-              {formatCurrency(SAVINGS_AMOUNT)}
-            </h3>
-             <p className="text-[11px] text-gray-400 mt-1 uppercase tracking-widest opacity-60">Manual Asset</p>
+          <div className="relative z-10">
+            <p className="text-xs font-bold text-orange-100 uppercase tracking-widest">Cartera Ahorro</p>
+            {isEditingSavings ? (
+              <div className="flex items-center gap-2 mt-2">
+                <input 
+                  type="number"
+                  value={tempSavingsAmount}
+                  onChange={(e) => setTempSavingsAmount(e.target.value)}
+                  className="w-32 px-2 py-1 text-lg font-bold border border-white/30 rounded bg-white/20 text-white placeholder-white/50 outline-none focus:ring-2 focus:ring-white"
+                  autoFocus
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleSaveSavings();
+                    if (e.key === 'Escape') {
+                       setIsEditingSavings(false);
+                       setTempSavingsAmount(savingsAmount.toString());
+                    }
+                  }}
+                />
+                <button onClick={handleSaveSavings} className="p-1.5 text-white hover:bg-white/20 rounded">
+                  <Check className="w-5 h-5" />
+                </button>
+                <button onClick={() => { setIsEditingSavings(false); setTempSavingsAmount(savingsAmount.toString()); }} className="p-1.5 text-white hover:bg-white/20 rounded">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 mt-2">
+                <h3 className="text-3xl font-bold text-white">
+                  {loading ? <div className="h-8 bg-white/20 rounded w-32 animate-pulse"></div> : formatCurrency(savingsAmount)}
+                </h3>
+                <button 
+                  onClick={() => setIsEditingSavings(true)}
+                  className="p-1.5 text-orange-100 hover:text-white hover:bg-white/20 rounded-full opacity-0 group-hover:opacity-100 transition-all"
+                  title="Editar saldo de ahorro"
+                >
+                  <Edit2 className="w-5 h-5" />
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Total Assets */}
-        <div className="bg-slate-900 dark:bg-blue-600 p-6 rounded-xl shadow-lg text-white flex flex-col justify-between relative overflow-hidden">
-          <div className="absolute top-0 right-0 p-4 opacity-20">
-            <TrendingUp className="w-16 h-16 text-white" />
+        <div className="bg-slate-900 dark:bg-blue-600 p-6 rounded-xl shadow-lg text-white flex flex-col justify-between relative overflow-hidden group transition-all hover:shadow-xl hover:-translate-y-1">
+          <div className="absolute top-0 right-0 p-4 opacity-20 text-white transition-transform group-hover:scale-110 duration-300">
+            <TrendingUp className="w-24 h-24 -mr-4 -mt-4 text-white" />
           </div>
-          <div>
+          <div className="relative z-10">
             <p className="text-xs font-bold text-slate-400 dark:text-blue-100 uppercase tracking-widest">Patrimonio Neto</p>
             <h3 className="text-3xl font-bold text-white mt-2">
               {loading ? <div className="h-8 bg-slate-700 dark:bg-blue-400 rounded w-32 animate-pulse"></div> : formatCurrency(totalAssets)}
             </h3>
-          </div>
-          <div className="mt-4">
-             <span className="text-[10px] bg-white/10 px-2 py-1 rounded text-white/80 font-mono tracking-tighter">
-               ESTIMATED_WEALTH_INDEX
-             </span>
           </div>
         </div>
       </div>
